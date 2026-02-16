@@ -24,7 +24,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: application-jar
           path: target/*.jar
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: application-jar
 
@@ -48,21 +48,21 @@ jobs:
           port: ${{secrets.SSH_PORT}}
           source: "*.jar"
           target: ${{secrets.TARGET_PATH}}
-          strip-components: 0
+          strip_components: 0
       - name: Rename File
         uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.VM_HOST}}
-          user: ${{secrets.SSH_USER}}
+          username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_KEY}}
           port: ${{secrets.SSH_PORT}}
-          script:
+          script: |
             mv /home/aleadmin/PhishinBE/*.jar /home/aleadmin/PhishinBE/demo.jar
       - name: Restart Application
         uses: appleboy/ssh-action@master
         with:
             host: ${{secrets.VM_HOST}}
-            user: ${{secrets.SSH_USER}}
+            username: ${{secrets.SSH_USER}}
             key: ${{secrets.SSH_KEY}}
             port: ${{secrets.SSH_PORT}}
             script:

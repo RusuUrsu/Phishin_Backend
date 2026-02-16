@@ -16,7 +16,7 @@ import java.util.Objects;
 
 
 @RestController
-@RequestMapping("/scan")
+@RequestMapping("/api/scan")
 @CrossOrigin(origins = "*")
 public class ScanController {
     private final ObjectMapper objectMapper = new ObjectMapper();
