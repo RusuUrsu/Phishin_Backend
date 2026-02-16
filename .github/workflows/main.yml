@@ -1,0 +1,70 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - development
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build Project
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: application-jar
+          path: target/*.jar
+          retention-days: 5
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: application-jar
+
+      - name: Deploy to VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.VM_HOST}}
+          username: ${{secrets.SSH_USER}}
+          key: ${{secrets.SSH_KEY}}
+          port: ${{secrets.SSH_PORT}}
+          source: "*.jar"
+          target: ${{secrets.TARGET_PATH}}
+          strip-components: 0
+      - name: Rename File
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.VM_HOST}}
+          user: ${{secrets.SSH_USER}}
+          key: ${{secrets.SSH_KEY}}
+          port: ${{secrets.SSH_PORT}}
+          script:
+            mv /home/aleadmin/PhishinBE/*.jar /home/aleadmin/PhishinBE/demo.jar
+      - name: Restart Application
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{secrets.VM_HOST}}
+            user: ${{secrets.SSH_USER}}
+            key: ${{secrets.SSH_KEY}}
+            port: ${{secrets.SSH_PORT}}
+            script:
+              sudo systemctl restart phishin
+          
+      
