@@ -57,7 +57,8 @@ jobs:
           key: ${{secrets.SSH_KEY}}
           port: ${{secrets.SSH_PORT}}
           script: |
-            mv -f /home/aleadmin/PhishinBE/*.jar /home/aleadmin/PhishinBE/demo.jar
+            rm -f /home/aleadmin/PhishinBE/demo.jar
+            mv /home/aleadmin/PhishinBE/*.jar /home/aleadmin/PhishinBE/demo.jar
       - name: Restart Application
         uses: appleboy/ssh-action@master
         with:
